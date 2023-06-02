@@ -17,7 +17,6 @@ export const SharedLayout = () => {
           </Logo>
           <nav>
             <Links to="/">Головна</Links>
-            {/* <Links to="/shipments">Превезення</Links> */}
             <Links to="/order">Замовити перевезення</Links>
             <Links to="/about">Про компанію</Links>
           </nav>
