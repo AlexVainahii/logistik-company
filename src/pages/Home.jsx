@@ -1,8 +1,8 @@
-import { Links } from "../components/SharedLayout.styled";
+import { Links, Main } from "../components/SharedLayout.styled";
 
 export const Home = () => {
   return (
-    <main style={{ padding: "20px" }}>
+    <Main>
       <div className="container">
         <h2>Ласкаво просимо до "LOGICTRANS"!</h2>
         <p>
@@ -75,6 +75,6 @@ export const Home = () => {
           margin-bottom: 5px;
         }
       `}</style>
-    </main>
+    </Main>
   );
 };

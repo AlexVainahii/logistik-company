@@ -11,19 +11,29 @@ import {
 import { useEffect } from "react";
 import MapWithRoute from "./MapWithRoute";
 import { Container } from "./SharedLayout.styled";
-import { ShipmentBlock } from "./ShipmentBlock";
+import ShipmentBlock from "./ShipmentBlock";
 import { IconButton } from "@mui/material";
 import { Back } from "./ShipmentBlock.styled";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Title } from "./ShipmentList.styled";
+import { Title } from "./OrderForm.styled";
 import { ToastContainer, toast } from "react-toastify";
 import { nanoid } from "nanoid";
-
+import {
+  ButtonsContainer,
+  Form,
+  FormRow,
+  TextButton,
+  Input,
+  Label,
+  LinkButton,
+  SubmitButton,
+  SuggestionsList,
+} from "./OrderForm.styled";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 const OrderForm = () => {
   const { id } = useParams();
   const location = useLocation();
-  const backLinkHref = location.state?.from ?? "/shipments";
   const navigate = useNavigate();
   const currentDate = new Date().toISOString().split("T")[0];
   const [originCity, setOriginCity] = useState("");
@@ -208,19 +218,19 @@ const OrderForm = () => {
       setCreateElement(true);
     }
     // Очищення форми після збереження
-    setOriginCity("");
-    setDestinationCity("");
-    setOriginCountry("");
-    setDestinationCountry("");
-    setWeight(50);
-    setOriginDate(currentDate);
-    setDestinationDate(currentDate);
-    setOriginRoute([]);
-    setdDestinationRoute([]);
-    setCost([]);
-    setDistance(0);
-    setOriginFlag(false);
-    setoDestinationFlag(false);
+    // setOriginCity("");
+    // setDestinationCity("");
+    // setOriginCountry("");
+    // setDestinationCountry("");
+    // setWeight(50);
+    // setOriginDate(currentDate);
+    // setDestinationDate(currentDate);
+    // setOriginRoute([]);
+    // setdDestinationRoute([]);
+    // setCost([]);
+    // setDistance(0);
+    // setOriginFlag(false);
+    // setoDestinationFlag(false);
 
     // Ваш код обробки форми
 
@@ -234,7 +244,6 @@ const OrderForm = () => {
         pauseOnHover: true, // Пауза при наведенні курсору
         draggable: true, // Можливість перетягування Toast
       });
-      navigate(backLinkHref, { replace: true });
     } else {
       toast.success("Замовлення успішно збережено!", {
         position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
@@ -253,62 +262,24 @@ const OrderForm = () => {
   return (
     <Container>
       {!createElement ? (
-        <Title style={{ marginTop: "0px", paddingTop: "20px" }}>
-          Створити нове замовлення
-        </Title>
+        <Title>Замовлення перевезення</Title>
       ) : (
-        <Title style={{ marginTop: "0px", paddingTop: "20px" }}>
-          Ваше замовлення
-        </Title>
+        <Title>Оформлення замовлення</Title>
       )}
-      {id && (
-        <Link
-          to={backLinkHref}
-          style={{
-            textDecoration: "none",
-            marginLeft: "170px",
-            display: "flex",
-            alignItems: "center",
-            color: "inherit",
-            width: "50px",
-          }}
-        >
-          <IconButton color="primary">
-            <ArrowBackIcon />
-          </IconButton>
-          <Back>Повернутись </Back>
-        </Link>
-      )}
+
       <div style={{ display: "flex" }}>
         {!createElement && (
-          <form
-            style={{
-              width: "750px",
-              margin: "0 auto", // Розміщення по центру
-              padding: "20px", // Відступи від країв форми
-              border: "1px solid #ccc", // Рамка форми
-              borderRadius: "5px", // Закруглені кути форми
-              boxSizing: "border-box", // Загальна ширина враховує відступи та рамку
-            }}
-            onSubmit={handleFormSubmit}
-          >
-            <div>
-              <label htmlFor="originCity">Початковий пункт:</label>
-              <input
+          <Form onSubmit={handleFormSubmit}>
+            <FormRow>
+              <Label htmlFor="originCity">Початковий пункт:</Label>
+              <Input
                 type="text"
                 id="originCity"
                 value={originCity}
                 onChange={handleOriginCityChange}
                 disabled={id}
-                style={{
-                  width: "100%",
-                  padding: "5px",
-                  borderRadius: "3px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#f5f5f5",
-                }}
               />
-              <ul style={{ listStyle: "none", padding: "0" }}>
+              <SuggestionsList>
                 {suggestedOrigins
                   .filter(
                     (suggestion) => suggestion.components.city !== undefined
@@ -321,40 +292,29 @@ const OrderForm = () => {
                       {suggestion.formatted}
                     </li>
                   ))}
-              </ul>
-              <label htmlFor="originCountry">Країна походження:</label>
-              <input
+              </SuggestionsList>
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="originCountry">Країна походження:</Label>
+              <Input
                 type="text"
                 id="originCountry"
                 value={originCountry}
                 disabled
-                style={{
-                  width: "100%",
-                  padding: "5px",
-                  borderRadius: "3px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#f5f5f5",
-                }}
               />
-            </div>
+            </FormRow>
 
-            <div>
-              <label htmlFor="destinationCity">Кінцевий пункт:</label>
-              <input
+            <FormRow>
+              <Label htmlFor="destinationCity">Кінцевий пункт:</Label>
+              <Input
                 type="text"
                 id="destinationCity"
                 value={destinationCity}
                 onChange={handleDestinationCityChange}
                 disabled={id}
-                style={{
-                  width: "100%",
-                  padding: "5px",
-                  borderRadius: "3px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#f5f5f5",
-                }}
               />
-              <ul style={{ listStyle: "none", padding: "0" }}>
+              <SuggestionsList>
                 {suggestedDestinations
                   .filter(
                     (suggestion) => suggestion.components.city !== undefined
@@ -369,162 +329,82 @@ const OrderForm = () => {
                       {suggestion.formatted}
                     </li>
                   ))}
-              </ul>
-              <label htmlFor="destinationCountry">Країна призначення:</label>
-              <input
+              </SuggestionsList>
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="destinationCountry">Країна призначення:</Label>
+              <Input
                 type="text"
                 id="destinationCountry"
                 value={destinationCountry}
                 disabled
-                style={{
-                  width: "100%",
-                  padding: "5px",
-                  borderRadius: "3px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#f5f5f5",
-                }}
               />
-            </div>
-            <div style={{ display: "flex", padding: "10px" }}>
-              <div style={{ padding: "0px" }}>
-                <div>
-                  <label htmlFor="originDate" style={{ paddingRight: "20px" }}>
-                    Дата погрузки:
-                  </label>
-                  <input
-                    type="date"
-                    id="originDate"
-                    disabled={id}
-                    value={originDate}
-                    onChange={handleOriginDateChange}
-                    min={currentDate}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="destinationDate"
-                    style={{ paddingRight: "26px" }}
-                  >
-                    Дата приїзду:
-                  </label>
-                  <input
-                    type="date"
-                    id="destinationDate"
-                    value={destinationDate}
-                    min={currentDate}
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label htmlFor="client" style={{ marginRight: "20px" }}>
-                    Замовник
-                  </label>
-                  <input
-                    type="string"
-                    id="client"
-                    value={client}
-                    onChange={handleClientChange}
-                  />
-                </div>
-              </div>
-              <div style={{ padding: "0" }}>
-                <div>
-                  <label htmlFor="weight" style={{ marginRight: "20px" }}>
-                    Вага, кг:
-                  </label>
-                  <input
-                    type="number"
-                    id="weight"
-                    value={weight}
-                    onChange={handleWeightChange}
-                    min={50}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="distance" style={{ marginRight: "10px" }}>
-                    Відстань:
-                  </label>
-                  <input
-                    type="text"
-                    id="distance"
-                    value={distance}
-                    disabled
-                    style={{ fontWidth: 700 }}
-                  />
-                </div>
+            </FormRow>
 
-                <div>
-                  <label htmlFor="cost" style={{ marginRight: "10px" }}>
-                    Вартість доставки:
-                  </label>
-                  <input
-                    type="text"
-                    id="cost"
-                    value={cost}
-                    disabled
-                    style={{ fontWidth: 700 }}
-                  />
-                </div>
-              </div>
-            </div>
-            <button
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "3px",
-                border: "none",
-                backgroundColor: "#007bff",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-              type="submit"
-            >
-              Відправити
-            </button>
-          </form>
+            <FormRow>
+              <Label htmlFor="originDate">Дата погрузки:</Label>
+              <Input
+                type="date"
+                id="originDate"
+                disabled={id}
+                value={originDate}
+                onChange={handleOriginDateChange}
+                min={currentDate}
+              />
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="client">Замовник:</Label>
+              <Input
+                type="string"
+                id="client"
+                value={client}
+                onChange={handleClientChange}
+              />
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="weight">Вага, кг:</Label>
+              <Input
+                type="number"
+                id="weight"
+                value={weight}
+                onChange={handleWeightChange}
+                min={50}
+              />
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="distance">Відстань:</Label>
+              <Input type="text" id="distance" value={distance} disabled />
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="cost">Вартість доставки:</Label>
+              <Input type="text" id="cost" value={cost} disabled />
+            </FormRow>
+
+            <SubmitButton type="submit">
+              <TextButton>Оформити замовлення </TextButton>
+              <LocalShippingIcon />
+            </SubmitButton>
+          </Form>
         )}
 
         {createElement && (
           <div style={{ width: "750px" }}>
-            <div
-              style={{
-                display: "flex",
-              }}
-            >
-              <Link
-                to={"/shipments"}
-                style={{
-                  width: "500px",
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  color: "inherit",
-                }}
-              >
+            <ButtonsContainer>
+              <LinkButton to="/shipments">
                 <IconButton color="primary">
                   <ArrowBackIcon />
                 </IconButton>
-                <Back style={{ marginRight: "150px" }}>
-                  Перейти до списку перевезень
-                </Back>
-              </Link>
-              <button
-                style={{
-                  padding: "10px",
-                  borderRadius: "3px",
-                  border: "none",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  handleNewShipment();
-                }}
-                type="button"
-              >
-                Зробити нове замовлення
-              </button>
-            </div>
+                <Back>Перейти до списку перевезень</Back>
+              </LinkButton>
+              <ButtonsContainer onClick={handleNewShipment}>
+                Створити замовлення
+              </ButtonsContainer>
+            </ButtonsContainer>
             <ShipmentBlock shipment={shipment} condition={false} />
             <MapWithRoute shipment={shipment} />
           </div>

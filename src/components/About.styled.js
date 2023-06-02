@@ -1,5 +1,4 @@
-import styled from 'styled-components';
-
+import styled from "styled-components";
 export const Nav = styled.nav`
   ul {
     list-style: none;
@@ -24,7 +23,19 @@ export const Tab = styled.li`
     border-radius: 5px;
 
     &:hover {
-      background-color: #f0f0f0;
+      background-color: orangered;
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: block;
+    margin-right: 0;
+    margin-bottom: 10px;
+    width: 100%;
+
+    a {
+      display: block;
+      width: 100%;
     }
   }
 `;

@@ -9,6 +9,7 @@ import {
   ReviewSubmitButton,
 } from "./Reviews.styled";
 import { addReviews, getReviews } from "../fakeApi";
+import ReviewsIcon from "@mui/icons-material/Reviews";
 
 export const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -76,7 +77,7 @@ export const Reviews = () => {
             required
           />
           <ReviewSubmitButton type="submit">
-            Надіслати відгук
+            Надіслати відгук <ReviewsIcon style={{ marginLeft: "20px" }} />
           </ReviewSubmitButton>
         </ReviewForm>
       </div>

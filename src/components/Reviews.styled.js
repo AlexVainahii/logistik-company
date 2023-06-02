@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const ReviewContainer = styled.div`
   margin-bottom: 20px;
@@ -26,6 +26,8 @@ export const ReviewInput = styled.input`
 `;
 
 export const ReviewSubmitButton = styled.button`
+  display: flex;
+  align-items: center;
   padding: 8px 12px;
   border-radius: 3px;
   background-color: #007bff;
