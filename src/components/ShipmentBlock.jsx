@@ -2,8 +2,9 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import Icon from "@mui/material/Icon";
 import Tooltip from "@mui/material/Tooltip";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import {
   CardWrapper,
@@ -20,80 +21,54 @@ import {
 import { StyledIconAdd } from "./ShipmentBlockIcon.styled";
 import { generateString, generateSumString } from "../fakeApi";
 
-const getStatusColor = (status) => {
-  let className = "default";
-
-  switch (status) {
-    case "В процесі":
-      className = "in-progress";
-      break;
-    case "Виконано":
-      className = "completed";
-      break;
-    default:
-      className = "default";
-      break;
-  }
-
-  return className;
-};
-
-const ShipmentBlock = ({ shipment }) => {
+const ShipmentBlock = ({
+  shipment,
+  handleChangeShipment,
+  handleDeleteShipment,
+}) => {
   const location = useLocation();
 
   return (
-    <CardWrapper className={getStatusColor(shipment.statusShip)}>
-      <Link
-        to={`${shipment.id}`}
-        state={{ from: location }}
-        key={shipment.id}
-        shipment={shipment}
-      >
-        <div>
-          <ProductName>
-            {shipment.isInternational
-              ? "Міжнародне перевезення"
-              : "Внутрішнє перевезення"}{" "}
-            №: {shipment.shipmentNum}
-          </ProductName>
-          <Status>Статус: {shipment.statusShip}</Status>
-          <Status>{generateString(shipment.client)}</Status>
-          <Wrapper>
-            <Wrap>
-              <Pag>Початковий пункт:</Pag>
-              <Pag>{shipment.originCity}</Pag>
-              <Pag>{shipment.originCountry}</Pag>
-              <Dates>
-                Дата: {new Date(shipment.originDate).toLocaleDateString()}
-              </Dates>
-              <Weight>Вага: {generateSumString(shipment.weight, "кг")}</Weight>
-            </Wrap>
-            <WrapArrow>
-              <Pag> {shipment.distance} км</Pag>
-              <Icon component={ArrowForwardIcon} />
-            </WrapArrow>
-            <Wrap>
-              <Pag>Кінцевий пункт:</Pag>
-              <Pag>{shipment.destinationCity}</Pag>
-              <Pag> {shipment.destinationCountry}</Pag>
-              <Dates>
-                Дата: {new Date(shipment.destinationDate).toLocaleDateString()}
-              </Dates>
-              <Weight>Ціна: {generateSumString(shipment.cost, "грн")}</Weight>
-            </Wrap>
-          </Wrapper>
-        </div>
-      </Link>
-      {shipment.statusShip === "В очікуванні" && (
-        <ButtonWrapper>
-          <Link
-            to={`/order/${shipment.id}`}
-            state={{ from: location }}
-            key={shipment.id}
-            shipment={shipment}
-          ></Link>
-        </ButtonWrapper>
-      )}
+    <CardWrapper>
+      <div>
+        <ProductName>
+          {shipment.isInternational
+            ? "Міжнародне перевезення"
+            : "Внутрішнє перевезення"}{" "}
+          №: {shipment.shipmentNum}
+        </ProductName>
+        <Status>Статус: {shipment.statusShip}</Status>
+        <Status>{shipment.client}</Status>
+        <Wrapper>
+          <Wrap>
+            <Pag>Початковий пункт:</Pag>
+            <Pag>{shipment.originCity}</Pag>
+            <Pag>{shipment.originCountry}</Pag>
+            <Dates>
+              Дата: {new Date(shipment.originDate).toLocaleDateString()}
+            </Dates>
+            <Weight>Вага: {shipment.weight}, "кг"</Weight>
+          </Wrap>
+          <WrapArrow>
+            <Pag> {shipment.distance} км</Pag>
+            <Icon component={ArrowForwardIcon} />
+          </WrapArrow>
+          <Wrap>
+            <Pag>Кінцевий пункт:</Pag>
+            <Pag>{shipment.destinationCity}</Pag>
+            <Pag> {shipment.destinationCountry}</Pag>
+            <Dates>
+              Дата: {new Date(shipment.destinationDate).toLocaleDateString()}
+            </Dates>
+            <Weight>Ціна: {shipment.cost}, "грн"</Weight>
+          </Wrap>
+        </Wrapper>
+      </div>
+
+      <ButtonWrapper>
+        <AutoFixHighIcon onClick={handleChangeShipment} />
+        <DeleteIcon onClick={handleDeleteShipment} />
+      </ButtonWrapper>
     </CardWrapper>
   );
 };

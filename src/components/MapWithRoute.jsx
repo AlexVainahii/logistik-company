@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import L from "leaflet";
+import "leaflet-arrowheads";
 import "leaflet/dist/leaflet.css";
 import markerIcon from "../images/marker-icon.png";
 import { getDistance, getZoom, getcentrMap } from "../fakeApi";
@@ -66,6 +67,10 @@ const MapWithRoute = ({ shipment }) => {
     );
     // Додавання лінії маршруту
     const routeLine = L.polyline(coordinates).addTo(mapRef.current);
+    routeLine.arrowheads({
+      size: "15px",
+      frequency: "endonly",
+    });
 
     // Збільшення масштабу, щоб лінія маршруту була видимою
     mapRef.current.fitBounds(routeLine.getBounds());

@@ -87,11 +87,18 @@ export const Button = styled.button`
   }
 `;
 
-export const LinkButton = styled(Link)`
-  text-decoration: none;
+export const LinkButton = styled.button`
   display: flex;
+  padding: 10px;
+  border-radius: 3px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  width: 70%;
+  justify-content: center;
   align-items: center;
-  color: inherit;
+  margin: 0 auto;
 `;
 
 export const IconButtons = styled(IconButton)`

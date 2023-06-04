@@ -12,10 +12,7 @@ import { useEffect } from "react";
 import MapWithRoute from "./MapWithRoute";
 import { Container } from "./SharedLayout.styled";
 import ShipmentBlock from "./ShipmentBlock";
-import { IconButton } from "@mui/material";
-import { Back } from "./ShipmentBlock.styled";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Title } from "./OrderForm.styled";
 import { ToastContainer, toast } from "react-toastify";
 import { nanoid } from "nanoid";
@@ -52,12 +49,63 @@ const OrderForm = () => {
   const [createElement, setCreateElement] = useState(null);
   const [shipment, setShipment] = useState(null);
   const [client, setClient] = useState("");
+  const [email, setEmail] = useState("");
+
   const [originFlag, setOriginFlag] = useState(false);
   const [destinationFlag, setoDestinationFlag] = useState(false);
+  const [originCityError, setOriginCityError] = useState("");
+  const [destinationCityError, setDestinationCityError] = useState("");
+  const [clientError, setClientError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate origin city
+    if (originCity.trim() === "" || originCityError) {
+      setOriginCityError(
+        "Необхідно вказати та вибрати правильний початковий пункт"
+      );
+      isValid = false;
+    } else {
+      setOriginCityError("");
+    }
+
+    // Validate destination city
+    if (destinationCity.trim() === "" || destinationCityError) {
+      setDestinationCityError(
+        "Необхідно вказати та вибрати правильний  кінцевий пункт"
+      );
+      isValid = false;
+    } else {
+      setDestinationCityError("");
+    }
+
+    // Validate client
+    if (client.trim() === "") {
+      setClientError("Необхідно вказати ім’я клієнта");
+      isValid = false;
+    } else {
+      setClientError("");
+    }
+    // Validate email
+    if (email.trim() === "" || emailError) {
+      setEmailError("Необхідно вказати вашу електронну пошту");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    return isValid;
+  };
+
   const handleOriginCityChange = async (event) => {
     const value = event.target.value;
     setOriginCity(value);
-
+    console.log(value);
     try {
       const response = await axios.get(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
@@ -65,17 +113,23 @@ const OrderForm = () => {
         )}&key=4b6e7d31f0654074aa698fd64a45063c`
       );
       const suggestions = response.data.results;
-
+      console.log(suggestions);
+      !suggestions[0]
+        ? setOriginCityError("Не можливо знайти місто")
+        : setOriginCityError("");
       setSuggestedOrigins(suggestions);
       setOriginFlag(false);
     } catch (error) {
       console.log("Помилка запиту геокодування:", error.message);
       setSuggestedOrigins([]);
+      setOriginCityError(
+        "Необхідно вказати та вибрати правильний початковий пункт"
+      );
     }
   };
 
   const handleDestinationCityChange = async (event) => {
-    const value = event.target.value;
+    const value = event.currentTarget.value;
     setDestinationCity(value);
 
     try {
@@ -85,11 +139,17 @@ const OrderForm = () => {
         )}&key=4b6e7d31f0654074aa698fd64a45063c`
       );
       const suggestions = response.data.results;
+      !suggestions[0]
+        ? setDestinationCityError("Не можливо знайти місто")
+        : setDestinationCityError("");
       setSuggestedDestinations(suggestions);
       setoDestinationFlag(false);
     } catch (error) {
       console.log("Помилка запиту геокодування:", error.message);
       setSuggestedDestinations([]);
+      setDestinationCityError(
+        "Необхідно вказати та вибрати правильний кінцевий пункт"
+      );
     }
   };
 
@@ -122,10 +182,19 @@ const OrderForm = () => {
   const handleClientChange = (event) => {
     const value = event.target.value;
     setClient(value);
+    setClientError("");
   };
   const handleWeightChange = (event) => {
     const value = event.target.value;
     setWeight(value);
+  };
+  const handleEmailChange = (e) => {
+    if (isValidEmail(e.target.value) || !e.target.value) {
+      setEmailError("");
+    } else {
+      setEmailError("Неправильний формат електронної пошти");
+    }
+    setEmail(e.target.value);
   };
 
   useEffect(() => {
@@ -182,82 +251,91 @@ const OrderForm = () => {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    if (id) {
-      const newOrder = {
-        ...shipment,
-        cost: [...shipment.cost, cost],
-        client: [...shipment.client, client],
-        weight: [...shipment.weight, Number(weight)],
-      };
-      addOrders(newOrder);
+    if (validateForm()) {
+      if (id) {
+        //Внесення змін до обєкту
+        const newOrder = {
+          ...shipment,
+          cost: cost,
+          client: client,
+          weight: Number(weight),
+          email: email,
+        };
+        addOrders(newOrder);
+      } else {
+        // Створення нового об'єкта з введеними даними
+        const newOrder = {
+          id: nanoid(),
+          shipmentNum:
+            originCity[0] + destinationCity[0] + distance + client[0],
+          originCity: originCity.toString(),
+          originCountry: originCountry.toString(),
+
+          destinationCity: destinationCity.toString(),
+          destinationCountry: destinationCountry.toString(),
+          weight: Number(weight),
+          statusShip: "Оформлення",
+          originDate: new Date(originDate).toISOString(),
+          destinationDate: new Date(destinationDate).toISOString(),
+          originRoute: originRoute,
+          destinationRoute: destinationRoute,
+          isInternational: getInternational(originCountry, destinationCountry),
+          distance: distance,
+          cost: cost,
+          client: client,
+          email: email,
+        };
+        setShipment(newOrder);
+        setCreateElement(true);
+      }
     } else {
-      // Створення нового об'єкта з введеними даними
-      const newOrder = {
-        id: nanoid(),
-        shipmentNum: originCity[0] + destinationCity[0] + distance + client,
-        originCity: originCity.toString(),
-        originCountry: originCountry.toString(),
-
-        destinationCity: destinationCity.toString(),
-        destinationCountry: destinationCountry.toString(),
-        weight: [Number(weight)],
-        statusShip: "В очікуванні",
-        originDate: new Date(originDate).toISOString(),
-        destinationDate: new Date(destinationDate).toISOString(),
-        originRoute: originRoute,
-        destinationRoute: destinationRoute,
-        isInternational: getInternational(originCountry, destinationCountry),
-        distance: distance,
-        cost: [cost],
-        client: [client],
-      };
-
-      addOrders(newOrder);
-
-      setShipment(newOrder);
-      setCreateElement(true);
+      toast.error("Не всі поля заповнено!", {
+        position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
+        autoClose: 3000, // Автоматичне закриття через 3 секунди
+        hideProgressBar: true, // Відображення прогрес-бару
+        closeOnClick: true, // Закриття Toast при кліку
+        pauseOnHover: true, // Пауза при наведенні курсору
+        draggable: true, // Можливість перетягування Toast
+      });
     }
-    // Очищення форми після збереження
-    // setOriginCity("");
-    // setDestinationCity("");
-    // setOriginCountry("");
-    // setDestinationCountry("");
-    // setWeight(50);
-    // setOriginDate(currentDate);
-    // setDestinationDate(currentDate);
-    // setOriginRoute([]);
-    // setdDestinationRoute([]);
-    // setCost([]);
-    // setDistance(0);
-    // setOriginFlag(false);
-    // setoDestinationFlag(false);
-
-    // Ваш код обробки форми
-
     // Показати Toast повідомлення
-    if (id) {
-      toast.success("Ваше дані успішно додані до Замовлення!", {
-        position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
-        autoClose: 3000, // Автоматичне закриття через 3 секунди
-        hideProgressBar: true, // Відображення прогрес-бару
-        closeOnClick: true, // Закриття Toast при кліку
-        pauseOnHover: true, // Пауза при наведенні курсору
-        draggable: true, // Можливість перетягування Toast
-      });
-    } else {
-      toast.success("Замовлення успішно збережено!", {
-        position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
-        autoClose: 3000, // Автоматичне закриття через 3 секунди
-        hideProgressBar: true, // Відображення прогрес-бару
-        closeOnClick: true, // Закриття Toast при кліку
-        pauseOnHover: true, // Пауза при наведенні курсору
-        draggable: true, // Можливість перетягування Toast
-      });
-    }
-    // Виведення підтвердження успішного збереження
   };
-  const handleNewShipment = () => {
+  const handleDeleteShipment = () => {
+    setShipment(null);
     setCreateElement(false);
+    setOriginCity("");
+    setDestinationCity("");
+    setOriginCountry("");
+    setDestinationCountry("");
+    setWeight(50);
+    setOriginDate(currentDate);
+    setDestinationDate(currentDate);
+    setOriginRoute([]);
+    setdDestinationRoute([]);
+    setEmail("");
+    setCost("");
+    setClient("");
+    setDistance(0);
+    setOriginFlag(false);
+    setoDestinationFlag(false);
+  };
+  const handleChangeShipment = () => {
+    setCreateElement(false);
+  };
+  const handleDesignShipment = () => {
+    addOrders(shipment);
+    toast.success("Замовлення успішно збережено!", {
+      position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
+      autoClose: 3000, // Автоматичне закриття через 3 секунди
+      hideProgressBar: true, // Відображення прогрес-бару
+      closeOnClick: true, // Закриття Toast при кліку
+      pauseOnHover: true, // Пауза при наведенні курсору
+      draggable: true, // Можливість перетягування Toast
+    });
+    navigate(`order/${shipment.id}`, { replace: true });
+  };
+  const ErrorMessage = ({ message }) => {
+    return <p style={{ color: "red" }}>{message}</p>;
   };
   return (
     <Container>
@@ -276,8 +354,7 @@ const OrderForm = () => {
                 type="text"
                 id="originCity"
                 value={originCity}
-                onChange={handleOriginCityChange}
-                disabled={id}
+                onInput={handleOriginCityChange}
               />
               <SuggestionsList>
                 {suggestedOrigins
@@ -294,7 +371,7 @@ const OrderForm = () => {
                   ))}
               </SuggestionsList>
             </FormRow>
-
+            {originCityError && <ErrorMessage message={originCityError} />}
             <FormRow>
               <Label htmlFor="originCountry">Країна походження:</Label>
               <Input
@@ -311,8 +388,7 @@ const OrderForm = () => {
                 type="text"
                 id="destinationCity"
                 value={destinationCity}
-                onChange={handleDestinationCityChange}
-                disabled={id}
+                onInput={handleDestinationCityChange}
               />
               <SuggestionsList>
                 {suggestedDestinations
@@ -331,7 +407,9 @@ const OrderForm = () => {
                   ))}
               </SuggestionsList>
             </FormRow>
-
+            {destinationCityError && (
+              <ErrorMessage message={destinationCityError} />
+            )}
             <FormRow>
               <Label htmlFor="destinationCountry">Країна призначення:</Label>
               <Input
@@ -349,7 +427,7 @@ const OrderForm = () => {
                 id="originDate"
                 disabled={id}
                 value={originDate}
-                onChange={handleOriginDateChange}
+                onInput={handleOriginDateChange}
                 min={currentDate}
               />
             </FormRow>
@@ -360,9 +438,20 @@ const OrderForm = () => {
                 type="string"
                 id="client"
                 value={client}
-                onChange={handleClientChange}
+                onInput={handleClientChange}
               />
             </FormRow>
+            {clientError && <ErrorMessage message={clientError} />}
+            <FormRow>
+              <Label htmlFor="email">Електронна пошта:</Label>
+              <Input
+                type="email"
+                id="email"
+                value={email}
+                onInput={handleEmailChange}
+              />
+            </FormRow>
+            {emailError && <ErrorMessage message={emailError} />}
 
             <FormRow>
               <Label htmlFor="weight">Вага, кг:</Label>
@@ -370,7 +459,7 @@ const OrderForm = () => {
                 type="number"
                 id="weight"
                 value={weight}
-                onChange={handleWeightChange}
+                onInput={handleWeightChange}
                 min={50}
               />
             </FormRow>
@@ -386,26 +475,24 @@ const OrderForm = () => {
             </FormRow>
 
             <SubmitButton type="submit">
-              <TextButton>Оформити замовлення </TextButton>
+              <TextButton>Замовити перевезення</TextButton>
               <LocalShippingIcon />
             </SubmitButton>
           </Form>
         )}
 
         {createElement && (
-          <div style={{ width: "750px" }}>
+          <div>
             <ButtonsContainer>
-              <LinkButton to="/shipments">
-                <IconButton color="primary">
-                  <ArrowBackIcon />
-                </IconButton>
-                <Back>Перейти до списку перевезень</Back>
+              <LinkButton onClick={handleDesignShipment}>
+                Оформити замовлення
               </LinkButton>
-              <ButtonsContainer onClick={handleNewShipment}>
-                Створити замовлення
-              </ButtonsContainer>
             </ButtonsContainer>
-            <ShipmentBlock shipment={shipment} condition={false} />
+            <ShipmentBlock
+              shipment={shipment}
+              handleChangeShipment={handleChangeShipment}
+              handleDeleteShipment={handleDeleteShipment}
+            />
             <MapWithRoute shipment={shipment} />
           </div>
         )}

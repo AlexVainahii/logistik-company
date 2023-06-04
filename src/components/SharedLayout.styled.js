@@ -122,6 +122,7 @@ export const NavMobile = styled.nav`
 `;
 
 export const Main = styled.div`
+  flex: 1 0 auto;
   margin: 0 auto;
   max-width: 800px;
   background-color: rgba(255, 255, 255, 0.8);
@@ -131,6 +132,7 @@ export const Main = styled.div`
 export const Footer = styled.footer`
   background: linear-gradient(to bottom, #000000, #333333);
   color: #fff;
+  flex-shrink: 0;
   padding: 20px;
 
   > ${Container} {

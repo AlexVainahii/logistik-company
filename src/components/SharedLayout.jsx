@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet, matchPath, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import {
   Container,
@@ -9,8 +9,8 @@ import {
   Footer,
   NavMobile,
   Nav,
-  NavItem,
   Content,
+  NavItem,
 } from "./SharedLayout.styled";
 import MenuIcon from "@mui/icons-material/Menu";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -31,15 +31,9 @@ export const SharedLayout = () => {
             <img src={imagess} alt="logo" width={300} />
           </Logo>
           <Nav>
-            <NavItem to="/" exact activeClassName="active">
-              Головна
-            </NavItem>
-            <NavItem to="/order" activeClassName="active">
-              Замовити перевезення
-            </NavItem>
-            <NavItem to="/about" activeClassName="active">
-              Про компанію
-            </NavItem>
+            <NavItem to="/">Головна</NavItem>
+            <NavItem to="/order">Замовити перевезення</NavItem>
+            <NavItem to="/about">Про компанію</NavItem>
           </Nav>
 
           <MenuButton onClick={toggleMenu}>
@@ -47,16 +41,10 @@ export const SharedLayout = () => {
           </MenuButton>
         </Container>
 
-        <NavMobile className={isMenuOpen && "is-visible"}>
-          <NavItem to="/" exact activeClassName="active">
-            Головна
-          </NavItem>
-          <NavItem to="/order" activeClassName="active">
-            Замовити перевезення
-          </NavItem>
-          <NavItem to="/about" activeClassName="active">
-            Про компанію
-          </NavItem>
+        <NavMobile className={isMenuOpen ? "is-visible" : undefined}>
+          <NavItem to="/">Головна</NavItem>
+          <NavItem to="/order">Замовити перевезення</NavItem>
+          <NavItem to="/about">Про компанію</NavItem>
         </NavMobile>
       </Header>
       <Main>
