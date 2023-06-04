@@ -1,20 +1,17 @@
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
 import axios from "axios";
 import {
-  addOrders,
+  addDataToMockAPI,
   calculateShippingCost,
   getDistance,
   getInternational,
-  getOrderById,
   getdestinationDate,
 } from "../fakeApi";
 import { useEffect } from "react";
-import MapWithRoute from "./MapWithRoute";
 import { Container } from "./SharedLayout.styled";
-import ShipmentBlock from "./ShipmentBlock";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Title } from "./OrderForm.styled";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { nanoid } from "nanoid";
 import {
   ButtonsContainer,
@@ -28,9 +25,9 @@ import {
   SuggestionsList,
 } from "./OrderForm.styled";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+const ShipmentBlock = lazy(() => import("./ShipmentBlock"));
+const MapWithRoute = lazy(() => import("./MapWithRoute"));
 const OrderForm = () => {
-  const { id } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
   const currentDate = new Date().toISOString().split("T")[0];
   const [originCity, setOriginCity] = useState("");
@@ -50,13 +47,13 @@ const OrderForm = () => {
   const [shipment, setShipment] = useState(null);
   const [client, setClient] = useState("");
   const [email, setEmail] = useState("");
-
   const [originFlag, setOriginFlag] = useState(false);
   const [destinationFlag, setoDestinationFlag] = useState(false);
   const [originCityError, setOriginCityError] = useState("");
   const [destinationCityError, setDestinationCityError] = useState("");
   const [clientError, setClientError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [save, setSave] = useState(false);
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -105,7 +102,7 @@ const OrderForm = () => {
   const handleOriginCityChange = async (event) => {
     const value = event.target.value;
     setOriginCity(value);
-    console.log(value);
+
     try {
       const response = await axios.get(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
@@ -113,7 +110,6 @@ const OrderForm = () => {
         )}&key=4b6e7d31f0654074aa698fd64a45063c`
       );
       const suggestions = response.data.results;
-      console.log(suggestions);
       !suggestions[0]
         ? setOriginCityError("Не можливо знайти місто")
         : setOriginCityError("");
@@ -198,42 +194,18 @@ const OrderForm = () => {
   };
 
   useEffect(() => {
-    if (id) {
-      const fetchData = async () => {
-        try {
-          const fetchedShipment = await getOrderById(id);
-          setShipment(fetchedShipment);
-          setOriginCity(fetchedShipment.originCity);
-          setOriginCountry(fetchedShipment.originCountry);
-          setDestinationCity(fetchedShipment.destinationCity);
-          setDestinationCountry(fetchedShipment.destinationCountry);
-          setOriginDate(fetchedShipment.originDate);
-          setDestinationDate(fetchedShipment.destinationDate);
-          setOriginRoute(fetchedShipment.originRoute);
-          setdDestinationRoute(fetchedShipment.destinationRoute);
-          setWeight(50);
-          setOriginFlag(true);
-          setoDestinationFlag(true);
-        } catch (error) {
-          console.error("Помилка при отриманні перевезень:", error);
-        }
-      };
-
-      fetchData();
-    }
-  }, [id]);
-  useEffect(() => {
     //Отримуємо відстань у кілометрах
     if (originFlag && destinationFlag && weight !== 0) {
       const newDistance = getDistance(originRoute, destinationRoute);
       const newDestinationDate = getdestinationDate(newDistance, originDate);
+
       const shippingCost = calculateShippingCost(
         newDistance,
         weight,
         10,
         getInternational(originCity, destinationCity)
       );
-      // Викликаємо функцію calculateShippingCost
+
       setDistance(newDistance);
       setCost(shippingCost);
       setDestinationDate(newDestinationDate);
@@ -248,46 +220,48 @@ const OrderForm = () => {
     destinationFlag,
     weight,
   ]);
-
+  useEffect(() => {
+    if (shipment && save) {
+      navigate(`/payment/${shipment.idd}`);
+      setSave(false);
+      setShipment(null);
+      setCreateElement(false);
+      toast.success("Перехід до оплати замовлення!", {
+        position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
+        autoClose: 3000, // Автоматичне закриття через 3 секунди
+        hideProgressBar: true, // Відображення прогрес-бару
+        closeOnClick: true, // Закриття Toast при кліку
+        pauseOnHover: true, // Пауза при наведенні курсору
+        draggable: true, // Можливість перетягування Toast
+      });
+    }
+  }, [shipment, navigate, save]);
   const handleFormSubmit = (event) => {
     event.preventDefault();
     if (validateForm()) {
-      if (id) {
-        //Внесення змін до обєкту
-        const newOrder = {
-          ...shipment,
-          cost: cost,
-          client: client,
-          weight: Number(weight),
-          email: email,
-        };
-        addOrders(newOrder);
-      } else {
-        // Створення нового об'єкта з введеними даними
-        const newOrder = {
-          id: nanoid(),
-          shipmentNum:
-            originCity[0] + destinationCity[0] + distance + client[0],
-          originCity: originCity.toString(),
-          originCountry: originCountry.toString(),
+      // Створення нового об'єкта з введеними даними
+      const newOrder = {
+        idd: nanoid(),
+        shipmentNum: originCity[0] + destinationCity[0] + distance + client[0],
+        originCity: originCity.toString(),
+        originCountry: originCountry.toString(),
 
-          destinationCity: destinationCity.toString(),
-          destinationCountry: destinationCountry.toString(),
-          weight: Number(weight),
-          statusShip: "Оформлення",
-          originDate: new Date(originDate).toISOString(),
-          destinationDate: new Date(destinationDate).toISOString(),
-          originRoute: originRoute,
-          destinationRoute: destinationRoute,
-          isInternational: getInternational(originCountry, destinationCountry),
-          distance: distance,
-          cost: cost,
-          client: client,
-          email: email,
-        };
-        setShipment(newOrder);
-        setCreateElement(true);
-      }
+        destinationCity: destinationCity.toString(),
+        destinationCountry: destinationCountry.toString(),
+        weight: Number(weight),
+        statusShip: "Оформлення",
+        originDate: new Date(originDate).toISOString(),
+        destinationDate: new Date(destinationDate).toISOString(),
+        originRoute: originRoute,
+        destinationRoute: destinationRoute,
+        isInternational: getInternational(originCountry, destinationCountry),
+        distance: distance,
+        cost: cost,
+        client: client,
+        email: email,
+      };
+      setShipment(newOrder);
+      setCreateElement(true);
     } else {
       toast.error("Не всі поля заповнено!", {
         position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
@@ -297,12 +271,34 @@ const OrderForm = () => {
         pauseOnHover: true, // Пауза при наведенні курсору
         draggable: true, // Можливість перетягування Toast
       });
-    }
-    // Показати Toast повідомлення
+    } // Показати Toast повідомлення
   };
   const handleDeleteShipment = () => {
-    setShipment(null);
     setCreateElement(false);
+    setShipment(null);
+    setSave(false);
+    setOriginCity("");
+    setDestinationCity("");
+    setOriginCountry("");
+    setDestinationCountry("");
+    setWeight(50);
+    setOriginDate(currentDate);
+    setDestinationDate(currentDate);
+    setOriginRoute([]);
+    setdDestinationRoute([]);
+    setEmail("");
+    setCost(0);
+    setClient("");
+    setDistance(0);
+    setOriginFlag(false);
+    setoDestinationFlag(false);
+  };
+  const handleChangeShipment = () => {
+    setCreateElement(false);
+  };
+  const handleDesignShipment = () => {
+    const fetchAdd = addDataToMockAPI(shipment, "shipment");
+
     setOriginCity("");
     setDestinationCity("");
     setOriginCountry("");
@@ -318,21 +314,8 @@ const OrderForm = () => {
     setDistance(0);
     setOriginFlag(false);
     setoDestinationFlag(false);
-  };
-  const handleChangeShipment = () => {
-    setCreateElement(false);
-  };
-  const handleDesignShipment = () => {
-    addOrders(shipment);
-    toast.success("Замовлення успішно збережено!", {
-      position: toast.POSITION.TOP_RIGHT, // Встановлення позиції Toast
-      autoClose: 3000, // Автоматичне закриття через 3 секунди
-      hideProgressBar: true, // Відображення прогрес-бару
-      closeOnClick: true, // Закриття Toast при кліку
-      pauseOnHover: true, // Пауза при наведенні курсору
-      draggable: true, // Можливість перетягування Toast
-    });
-    navigate(`order/${shipment.id}`, { replace: true });
+
+    setSave(fetchAdd);
   };
   const ErrorMessage = ({ message }) => {
     return <p style={{ color: "red" }}>{message}</p>;
@@ -390,6 +373,7 @@ const OrderForm = () => {
                 value={destinationCity}
                 onInput={handleDestinationCityChange}
               />
+
               <SuggestionsList>
                 {suggestedDestinations
                   .filter(
@@ -425,7 +409,6 @@ const OrderForm = () => {
               <Input
                 type="date"
                 id="originDate"
-                disabled={id}
                 value={originDate}
                 onInput={handleOriginDateChange}
                 min={currentDate}
@@ -497,7 +480,6 @@ const OrderForm = () => {
           </div>
         )}
       </div>
-      <ToastContainer />
     </Container>
   );
 };

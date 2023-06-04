@@ -6,7 +6,7 @@ export const Container = styled.div`
   padding: 20px;
 `;
 
-export const PaymentForm = styled.form`
+export const PForm = styled.form`
   display: flex;
   flex-direction: column;
   max-width: 400px;

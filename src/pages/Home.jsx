@@ -1,6 +1,6 @@
 import { Links, Main } from "../components/SharedLayout.styled";
 
-export const Home = () => {
+const Home = () => {
   return (
     <Main>
       <div className="container">
@@ -78,3 +78,4 @@ export const Home = () => {
     </Main>
   );
 };
+export default Home;

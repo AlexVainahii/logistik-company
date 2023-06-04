@@ -2,7 +2,7 @@ import { Nav, Tab } from "../components/About.styled";
 import { Links } from "../components/SharedLayout.styled";
 import { Outlet } from "react-router-dom";
 
-export const About = () => {
+const About = () => {
   return (
     <main style={{ minHeight: "625px" }}>
       <div>
@@ -25,3 +25,4 @@ export const About = () => {
     </main>
   );
 };
+export default About;

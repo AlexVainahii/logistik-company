@@ -1,4 +1,5 @@
-import { NavLink, Outlet, matchPath, useLocation } from "react-router-dom";
+import { Suspense } from "react";
+import { Outlet } from "react-router-dom";
 import React, { useState } from "react";
 import {
   Container,
@@ -15,6 +16,8 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import CancelIcon from "@mui/icons-material/Cancel";
 import imagess from "../images/logo3.png";
+import { ToastContainer } from "react-toastify";
+import { Loader } from "./Loader";
 
 export const SharedLayout = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -46,10 +49,13 @@ export const SharedLayout = () => {
           <NavItem to="/order">Замовити перевезення</NavItem>
           <NavItem to="/about">Про компанію</NavItem>
         </NavMobile>
+        <ToastContainer />
       </Header>
       <Main>
         <Container>
-          <Outlet />
+          <Suspense fallback={<Loader />}>
+            <Outlet />
+          </Suspense>
         </Container>
       </Main>
       <Footer>

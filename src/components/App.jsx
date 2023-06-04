@@ -1,13 +1,14 @@
-import { Route, Routes } from "react-router-dom";
-import { About } from "../pages/About";
-import { Home } from "../pages/Home";
-import { Team } from "./Team";
-import { Reviews } from "./Reviews";
-import { SharedLayout } from "./SharedLayout";
-import { Order } from "../pages/Order";
+import { lazy } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import { AboutUs } from "./AboutUs";
-import { Payment } from "../pages/Payment";
+import { Route, Routes } from "react-router-dom";
+import { SharedLayout } from "./SharedLayout";
+const AboutUs = lazy(() => import("./AboutUs"));
+const About = lazy(() => import("../pages/About"));
+const Home = lazy(() => import("../pages/Home"));
+const Payment = lazy(() => import("../pages/Payment"));
+const Order = lazy(() => import("../pages/Order"));
+const Team = lazy(() => import("./Team"));
+const Reviews = lazy(() => import("./Reviews"));
 
 export const App = () => {
   return (
@@ -20,7 +21,7 @@ export const App = () => {
           <Route path="reviews" element={<Reviews />} />
         </Route>
         <Route path="/order" element={<Order />}></Route>
-        {/* <Route path="/order/:id" element={<Payment />}></Route> */}
+        <Route path="/payment/:id" element={<Payment />}></Route>
       </Route>
     </Routes>
   );

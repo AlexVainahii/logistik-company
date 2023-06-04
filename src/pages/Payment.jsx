@@ -1,6 +1,6 @@
 import PaymentForm from "../components/PaymentForm";
 
-export const Payment = () => {
+const Payment = () => {
   return (
     <>
       <main>
@@ -9,3 +9,4 @@ export const Payment = () => {
     </>
   );
 };
+export default Payment;

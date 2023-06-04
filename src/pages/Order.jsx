@@ -1,6 +1,6 @@
 import OrderForm from "../components/OrderForm";
 
-export const Order = () => {
+const Order = () => {
   return (
     <>
       <main>
@@ -9,3 +9,4 @@ export const Order = () => {
     </>
   );
 };
+export default Order;

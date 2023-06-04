@@ -1,5 +1,4 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
 import Icon from "@mui/material/Icon";
 import Tooltip from "@mui/material/Tooltip";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
@@ -18,16 +17,12 @@ import {
   Weight,
   ButtonWrapper,
 } from "./ShipmentBlock.styled";
-import { StyledIconAdd } from "./ShipmentBlockIcon.styled";
-import { generateString, generateSumString } from "../fakeApi";
 
 const ShipmentBlock = ({
   shipment,
   handleChangeShipment,
   handleDeleteShipment,
 }) => {
-  const location = useLocation();
-
   return (
     <CardWrapper>
       <div>
@@ -47,7 +42,7 @@ const ShipmentBlock = ({
             <Dates>
               Дата: {new Date(shipment.originDate).toLocaleDateString()}
             </Dates>
-            <Weight>Вага: {shipment.weight}, "кг"</Weight>
+            <Weight>Вага: {shipment.weight}кг</Weight>
           </Wrap>
           <WrapArrow>
             <Pag> {shipment.distance} км</Pag>
@@ -60,14 +55,18 @@ const ShipmentBlock = ({
             <Dates>
               Дата: {new Date(shipment.destinationDate).toLocaleDateString()}
             </Dates>
-            <Weight>Ціна: {shipment.cost}, "грн"</Weight>
+            <Weight>Ціна: {shipment.cost}грн</Weight>
           </Wrap>
         </Wrapper>
       </div>
 
       <ButtonWrapper>
-        <AutoFixHighIcon onClick={handleChangeShipment} />
-        <DeleteIcon onClick={handleDeleteShipment} />
+        <Tooltip title="Змінити деталі замовлення" placement="top">
+          <AutoFixHighIcon onClick={handleChangeShipment} />
+        </Tooltip>
+        <Tooltip title="Видалити замовлення" placement="top">
+          <DeleteIcon onClick={handleDeleteShipment} />
+        </Tooltip>
       </ButtonWrapper>
     </CardWrapper>
   );

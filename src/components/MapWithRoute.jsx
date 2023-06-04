@@ -4,6 +4,7 @@ import "leaflet-arrowheads";
 import "leaflet/dist/leaflet.css";
 import markerIcon from "../images/marker-icon.png";
 import { getDistance, getZoom, getcentrMap } from "../fakeApi";
+
 var iconStyle = L.icon({
   iconUrl: markerIcon,
   iconSize: [30, 31],
@@ -74,7 +75,6 @@ const MapWithRoute = ({ shipment }) => {
 
     // Збільшення масштабу, щоб лінія маршруту була видимою
     mapRef.current.fitBounds(routeLine.getBounds());
-
     // Очищення мапи під час розмонтування компонента
     return () => {
       mapRef.current.remove();
