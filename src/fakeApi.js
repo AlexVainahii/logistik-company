@@ -52,9 +52,6 @@ export const getInternational = (origin, destination) => {
   return origin !== destination;
 };
 
-export const isInternational = (shipment) => {
-  return shipment.origin.country !== shipment.destination.country;
-};
 export const getcentrMap = (shipment) => {
   const centerLat =
     (shipment.originRoute.lat + shipment.destinationRoute.lat) / 2;
