@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/logistik-company/static/css/main.336deb5e.css",
+    "main.js": "/logistik-company/static/js/main.707a9632.js",
+    "static/media/fon_1.jpg": "/logistik-company/static/media/fon_1.a74ef51df712d95bb4d9.jpg",
+    "static/media/logo3.png": "/logistik-company/static/media/logo3.b928d099fe8c5d6a36e6.png",
+    "static/media/team_img_2.jpg": "/logistik-company/static/media/team_img_2.24d647d835a4d8cf7620.jpg",
+    "static/media/team_img_1.jpg": "/logistik-company/static/media/team_img_1.b41aa1c067deda7714f7.jpg",
+    "static/media/team_img_4.jpg": "/logistik-company/static/media/team_img_4.36d32df54776d28b1fec.jpg",
+    "static/media/team_img_3.jpg": "/logistik-company/static/media/team_img_3.ecf9ba82fd78d8645eb2.jpg",
+    "static/media/marker-icon.png": "/logistik-company/static/media/marker-icon.8be6cbde115d5b9948bb.png",
+    "index.html": "/logistik-company/index.html",
+    "main.336deb5e.css.map": "/logistik-company/static/css/main.336deb5e.css.map",
+    "main.707a9632.js.map": "/logistik-company/static/js/main.707a9632.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.336deb5e.css",
+    "static/js/main.707a9632.js"
+  ]
+}
