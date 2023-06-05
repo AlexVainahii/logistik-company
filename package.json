@@ -12,7 +12,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.4.0",
-    "firebase": "^9.22.1",
     "gh-pages": "^5.0.0",
     "leaflet": "^1.9.4",
     "leaflet-arrowheads": "^1.4.0",
